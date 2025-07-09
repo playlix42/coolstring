@@ -112,6 +112,23 @@ to create new CoolString objects with the same attributes as the creator object 
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="coolstring.CoolString.__float__">
+<span class="sig-prename descclassname"><span class="pre">CoolString.</span></span><span class="sig-name descname"><span class="pre">__float__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#coolstring.CoolString.__float__" title="Link to this definition">¶</a></dt>
+<dd><p>Converts the CoolString value to a float.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The float representation of the CoolString value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the value cannot be converted to a float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="coolstring.CoolString.__add__">
 <span class="sig-prename descclassname"><span class="pre">CoolString.</span></span><span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coolstring.CoolString.__add__" title="Link to this definition">¶</a></dt>
 <dd><p>Adds the given value to the CoolString value.</p>
@@ -124,9 +141,6 @@ to create new CoolString objects with the same attributes as the creator object 
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code></p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a string.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -192,7 +206,10 @@ The remaining part is added as the last element in the list.</p>
 <dd class="field-odd"><p>list(<code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code>)</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p></li>
+<li><p><strong>ValueError</strong> – If the CoolString value cannot be divided into the given number of parts.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -213,7 +230,10 @@ The remaining part is added as the last element in the list.</p>
 <dd class="field-odd"><p>list(<code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code>)</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p></li>
+<li><p><strong>ValueError</strong> – If the CoolString value cannot be divided into the given number of parts.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -235,7 +255,10 @@ and returns the remaining part as a new CoolString object.</p>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p></li>
+<li><p><strong>ValueError</strong> – If the CoolString value cannot be divided into the given number of parts.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -294,10 +317,7 @@ or performs a bitwise right shift on the string’s byte representation.</p>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If the given value is greater than the length of the CoolString value in string shift mode.</p></li>
-<li><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p></li>
-</ul>
+<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -553,8 +573,8 @@ or performs a bitwise left shift on the string’s byte representation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="coolstring.CoolString.__idiv__">
-<span class="sig-prename descclassname"><span class="pre">CoolString.</span></span><span class="sig-name descname"><span class="pre">__idiv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coolstring.CoolString.__idiv__" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="coolstring.CoolString.__itruediv__">
+<span class="sig-prename descclassname"><span class="pre">CoolString.</span></span><span class="sig-name descname"><span class="pre">__itruediv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#coolstring.CoolString.__itruediv__" title="Link to this definition">¶</a></dt>
 <dd><p>In-place division operator for CoolString.</p>
 <p>This method truncates the CoolString value to a fraction of its length based on the given value.
 This length is determined by the length of the CoolString divided by the given value.
@@ -659,10 +679,7 @@ or performs a bitwise right shift on the string’s byte representation.</p>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">CoolString</span></code></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If the given value is greater than the length of the CoolString value in string shift mode.</p></li>
-<li><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p></li>
-</ul>
+<dd class="field-even"><p><strong>ValueError</strong> – If the given value cannot be converted to a numeric.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -796,6 +813,9 @@ or performs a bitwise left shift on the string’s byte representation.</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>int</p>
 </dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the value cannot be converted to an integer.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -811,6 +831,9 @@ or performs a bitwise left shift on the string’s byte representation.</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>int</p>
 </dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the value cannot be converted to an integer.</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -825,6 +848,9 @@ or performs a bitwise left shift on the string’s byte representation.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the value cannot be converted to an integer.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1311,6 +1337,8 @@ shifts the bits, and then decodes it back to a string.</p>
 <li class="toctree-l2"><a class="reference internal" href="#private-methods">Private Methods</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/playlix42/coolstring">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pypi.org/project/coolstring">PyPI Package</a></li>
 </ul>
 
 <div class="relations">
