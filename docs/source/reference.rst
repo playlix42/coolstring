@@ -12,6 +12,7 @@ Public Methods
 .. automethod:: coolstring.CoolString.__str__
 .. automethod:: coolstring.CoolString.__repr__
 .. automethod:: coolstring.CoolString.__int__
+.. automethod:: coolstring.CoolString.__float__
 .. automethod:: coolstring.CoolString.__add__
 .. automethod:: coolstring.CoolString.__sub__
 .. automethod:: coolstring.CoolString.__mul__
@@ -34,7 +35,7 @@ Public Methods
 .. automethod:: coolstring.CoolString.__iadd__
 .. automethod:: coolstring.CoolString.__isub__
 .. automethod:: coolstring.CoolString.__imul__
-.. automethod:: coolstring.CoolString.__idiv__
+.. automethod:: coolstring.CoolString.__itruediv__
 .. automethod:: coolstring.CoolString.__ifloordiv__
 .. automethod:: coolstring.CoolString.__imod__
 .. automethod:: coolstring.CoolString.__ipow__
