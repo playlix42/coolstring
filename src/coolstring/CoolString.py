@@ -77,7 +77,6 @@ class CoolString:
         except ValueError:
             try:
                 val2 = int(float(val))
-                warnings.warn("Given variable converted to int", UserWarning)
             except ValueError:
                 raise ValueError("Given variable not convertable to numeric")
         return (val2, positive)
@@ -214,14 +213,17 @@ class CoolString:
         :meta public:
         """
         if "shiftmode" in kwargs.keys():
+            self._verbose("Configuring CoolString with shiftmode:", kwargs["shiftmode"])
             if kwargs["shiftmode"] not in ["stringshift", "bitshift"]:
                 raise ValueError("Invalid shiftmode")
             self.shiftmode = kwargs["shiftmode"]
         if "compmode" in kwargs.keys():
+            self._verbose("Configuring CoolString with compmode:", kwargs["compmode"])
             if kwargs["compmode"] not in ["length", "content", "unicodesum", "unicodemax"]:
                 raise ValueError("Invalid compmode")
             self.compmode = kwargs["compmode"]
         if "verbose" in kwargs.keys():
+            self._verbose("Configuring CoolString with verbose mode:", kwargs["verbose"])
             if not isinstance(kwargs["verbose"], bool):
                 raise ValueError("Verbose must be a boolean")
             self.verbose = kwargs["verbose"]
@@ -235,12 +237,14 @@ class CoolString:
         :param creator: An optional CoolString object that is used to copy the attributes of the creator object.
         :type creator: :class:`CoolString`, optional
         """
+        self.verbose = False
         if isinstance(creator, CoolString):
+            self._verbose("Initializing CoolString with value:", val, "and copying attributes from creator")
             self.__dict__ = creator.__dict__.copy()
         else:
+            self._verbose("Initializing CoolString with value:", val, "and default attributes:\n  (stringshift, content, verbose=False)")
             self.shiftmode = "stringshift"
             self.compmode = "content"
-            self.verbose = False
         self.val = self.convertval(val)
     
     def __str__(self):
@@ -251,6 +255,7 @@ class CoolString:
         :rtype: str
         :meta public:
         """
+        self._verbose("Converting CoolString value to string")
         return self.val
     
     def __repr__(self):
@@ -261,6 +266,7 @@ class CoolString:
         :rtype: str
         :meta public:
         """
+        self._verbose("Creating string representation of CoolString object")
         return f"CoolString({self.val!r})"
 
     def __int__(self):
@@ -272,10 +278,31 @@ class CoolString:
         :raises ValueError: If the value cannot be converted to an integer.
         :meta public:
         """
+        self._verbose("Converting CoolString value to int if possible")
         try:
             return int(self.val)
-        except (TypeError, ValueError) as e:
+        except ValueError as e:
+            try:
+                return int(float(self.val))
+            except (TypeError, ValueError) as e:
+                raise ValueError("Value not convertible to int")
+        except TypeError as e:
             raise ValueError("Value not convertible to int")
+
+    def __float__(self):
+        """
+        Converts the CoolString value to a float.
+
+        :return: The float representation of the CoolString value.
+        :rtype: float
+        :raises ValueError: If the value cannot be converted to a float.
+        :meta public:
+        """
+        self._verbose("Converting CoolString value to float if possible")
+        try:
+            return float(self.val)
+        except ValueError as e:
+            raise ValueError("Value not convertible to float")
 
     def __add__(self, other):
         """
@@ -285,9 +312,9 @@ class CoolString:
         :type other: str or any object that can be converted to a string.
         :return: A new CoolString object with the concatenated value.
         :rtype: :class:`CoolString`
-        :raises ValueError: If the given value cannot be converted to a string.
         :meta public:
         """
+        self._verbose("Performing addition operation on CoolString value")
         otr = self.convertval(other)
         return self._createnew(self.val + otr)
     
@@ -306,6 +333,7 @@ class CoolString:
         otr = self.convertval(other)
         if otr not in self.val:
             raise ValueError("Given variable not part of CoolString")
+        self._verbose("Removing", otr, "from CoolString value")
         return self._createnew(self.val.replace(otr, ""))
     
     def __mul__(self, other):
@@ -319,8 +347,10 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
+        self._verbose("Multiplying CoolString value by", other)
         if not pos:
             val2 = self.val[::-1]
         else:
@@ -340,10 +370,13 @@ class CoolString:
         :return: A list of new CoolString objects with the truncated values.
         :rtype: list(:class:`CoolString`)
         :raises ValueError: If the given value cannot be converted to a numeric.
+        :raises ValueError: If the CoolString value cannot be divided into the given number of parts.
         :meta public:
         """
+
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
+        self._verbose("Dividing CoolString value by", other)
         if not pos:
             val2 = self.val[::-1]
         else:
@@ -351,6 +384,8 @@ class CoolString:
         idx = 0
         ret = []
         div = len(val2)//abs(otr2)
+        if len(val2) < abs(otr2):
+            raise ValueError("Cannot divide CoolString in more parts than its length")
         while idx <= len(val2)-div:
             ret.append(self._createnew(val2[idx:idx+div][::-1] if not pos else val2[idx:idx+div]))
             idx += div
@@ -368,10 +403,12 @@ class CoolString:
         :return: A new CoolString object with the truncated value.
         :rtype: list(:class:`CoolString`)
         :raises ValueError: If the given value cannot be converted to a numeric.
+        :raises ValueError: If the CoolString value cannot be divided into the given number of parts.
         :meta public:
         """
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
+        self._verbose("Floor dividing CoolString value by", other)
         if not pos:
             val2 = self.val[::-1]
         else:
@@ -379,6 +416,8 @@ class CoolString:
         idx = 0
         ret = []
         div = len(val2) // abs(otr2)
+        if len(val2) < abs(otr2):
+            raise ValueError("Cannot divide CoolString in more parts than its length")
         while idx <= len(val2) - div:
             ret.append(self._createnew(val2[idx:idx + div][::-1] if not pos else val2[idx:idx + div]))
             idx += div
@@ -396,10 +435,13 @@ class CoolString:
         :return: A new CoolString object with the remaining value after division.
         :rtype: :class:`CoolString`
         :raises ValueError: If the given value cannot be converted to a numeric.
+        :raises ValueError: If the CoolString value cannot be divided into the given number of parts.
         :meta public:
         """
+
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
+        self._verbose("Performing modulo operation on CoolString value by", other)
         if not pos:
             val2 = self.val[::-1]
         else:
@@ -407,6 +449,8 @@ class CoolString:
         idx = 0
         ret = []
         div = len(val2) // abs(otr2)
+        if len(val2) < abs(otr2):
+            raise ValueError("Cannot divide CoolString in more parts than its length")
         while idx <= len(val2) - div:
             idx += div
         return self._createnew((val2[idx:][::-1] if not pos else val2[idx:]) if len(val2) % abs(otr2) != 0 else "")
@@ -426,8 +470,10 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
+        self._verbose("Performing power operation on CoolString value to the power of", other)
         val2 = len(self.val)
         if not pos:
             valx = 1
@@ -441,7 +487,7 @@ class CoolString:
                 ret = CoolString(self.val[0:1])
             else:
                 origlen = len(ret)
-                for i in range(1, otr2):
+                for i in range(0, otr2):
                     ret = ret * origlen
             return ret
         
@@ -453,6 +499,7 @@ class CoolString:
         :rtype: int
         :meta public:
         """
+        self._verbose("Getting length of CoolString value")
         return len(self.val)
 
     def __rshift__(self, other):
@@ -466,17 +513,17 @@ class CoolString:
         :type other: int or str or any object that can be converted to an integer.
         :return: A new CoolString object with the shifted value.
         :rtype: :class:`CoolString`
-        :raises ValueError: If the given value is greater than the length of the CoolString value in string shift mode.
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing right shift operation in", self.shiftmode, "mode")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
             return self.__lshift__(abs(otr2))
         if self.shiftmode == "stringshift":
             if otr2 > len(self.val):
-                raise ValueError("Given value greater than CoolString length")
+                return self._createnew("")
             return self._createnew(self.val[0:-otr2])
         elif self.shiftmode == "bitshift":
             return self._createnew(self.bitshift(self.val, otr2, "r"))
@@ -495,6 +542,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing left shift operation in", self.shiftmode, "mode")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
@@ -516,6 +564,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing bitwise AND operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         return self._createnew("".join(chr(ord(a) & ord(b)) for a, b in zip(val2, otr2)))
@@ -530,6 +579,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing bitwise OR operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         return self._createnew("".join(chr(ord(a) | ord(b)) for a, b in zip(val2, otr2)))
@@ -544,6 +594,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing bitwise XOR operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         return self._createnew("".join(chr(ord(a) ^ ord(b)) for a, b in zip(val2, otr2)))
@@ -562,6 +613,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing less than operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) < self.getcompval(otr)
     
@@ -576,6 +628,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing greater than operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) > self.getcompval(otr)
     
@@ -590,6 +643,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing less than or equal operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) <= self.getcompval(otr)
     
@@ -604,6 +658,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing greater than or equal operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) >= self.getcompval(otr)
     
@@ -618,6 +673,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing equal operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) == self.getcompval(otr)
     
@@ -632,6 +688,7 @@ class CoolString:
         :raises ValueError: If the comparison mode is invalid.
         :meta public:
         """
+        self._verbose("Performing not equal operation using", self.compmode, "comparasion")
         otr = self.convertval(other)
         return self.getcompval(self.val) != self.getcompval(otr)
         
@@ -647,6 +704,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing in-place addition operation")
         otr = self.convertval(other)
         self.val = self.val + otr
         return self
@@ -662,6 +720,7 @@ class CoolString:
         :raises ValueError: If the given value is not a substring of the CoolString value.
         :meta public:
         """
+        self._verbose("Performing in-place subtraction operation")
         otr = self.convertval(other)
         if otr not in self.val:
             raise ValueError("Given variable not part of CoolString")
@@ -679,6 +738,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place multiplication operation")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
@@ -686,7 +746,7 @@ class CoolString:
         self.val = self.val * abs(otr2)
         return self
     
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         """
         In-place division operator for CoolString.
 
@@ -701,6 +761,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place division operation")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
@@ -722,7 +783,8 @@ class CoolString:
         :rtype: :class:`CoolString`
         :raises ValueError: If the given value cannot be converted to a numeric.
         """
-        return self.__idiv__(other)
+        self._verbose("Performing in-place floor division operation")
+        return self.__itruediv__(other)
     
     def __imod__(self, other):
         """
@@ -739,6 +801,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place modulo operation")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
@@ -763,6 +826,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place power operation")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         val2 = len(self.val)
@@ -777,7 +841,7 @@ class CoolString:
                 self.val = self.val[0:1]
             else:
                 origlen = len(self.val)
-                for i in range(1, otr2):
+                for i in range(0, otr2):
                     self.val = self.val * origlen
         return self
                     
@@ -792,17 +856,17 @@ class CoolString:
         :type other: int or str or any object that can be converted to an integer.
         :return: The CoolString object itself after right shifting.
         :rtype: :class:`CoolString`
-        :raises ValueError: If the given value is greater than the length of the CoolString value in string shift mode.
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place right shift operation in", self.shiftmode, "mode")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
             return self.__ilshift__(abs(otr2))
         if self.shiftmode == "stringshift":
             if otr2 > len(self.val):
-                raise ValueError("Given value greater than CoolString length")
+                self.val = ""
             self.val = self.val[0:-otr2]
         elif self.shiftmode == "bitshift":
             self.val = self.bitshift(self.val, otr2, "r")
@@ -822,6 +886,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing in-place left shift operation in", self.shiftmode, "mode")
         otr = self.convertval(other)
         otr2, pos = self.classifyint(otr)
         if not pos:
@@ -842,6 +907,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing in-place bitwise AND operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         self.val = "".join(chr(ord(a) & ord(b)) for a, b in zip(val2, otr2))
@@ -857,6 +923,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing in-place bitwise OR operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         self.val = "".join(chr(ord(a) | ord(b)) for a, b in zip(val2, otr2))
@@ -872,6 +939,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Performing in-place bitwise XOR operation")
         otr = self.convertval(other)
         val2, otr2 = self.matchlengths(self.val, otr)
         self.val = "".join(chr(ord(a) ^ ord(b)) for a, b in zip(val2, otr2))
@@ -889,6 +957,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Converting CoolString to lowercase")
         return CoolString(self.val.lower())
     
     def __pos__(self):
@@ -901,6 +970,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Converting CoolString to uppercase")
         return CoolString(self.val.upper())
     
     def __invert__(self):
@@ -913,6 +983,7 @@ class CoolString:
         :rtype: :class:`CoolString`
         :meta public:
         """
+        self._verbose("Swapping case of CoolString")
         return CoolString(self.val.swapcase())
 
     def __trunc__(self):
@@ -921,8 +992,10 @@ class CoolString:
 
         :return: The integer representation of the CoolString value.
         :rtype: int
+        :raises ValueError: If the value cannot be converted to an integer.
         :meta public:
         """
+        self._verbose("Calculating truncated (int) value of CoolString")
         return int(self)
 
     def __ceil__(self):
@@ -933,8 +1006,10 @@ class CoolString:
 
         :return: The integer representation of the CoolString value rounded up.
         :rtype: int
+        :raises ValueError: If the value cannot be converted to an integer.
         :meta public:
         """
+        self._verbose("Calculating ceil value of CoolString")
         val2, pos = self.classifyint(self.val)
         if not pos:
             return int(self)
@@ -949,8 +1024,10 @@ class CoolString:
 
         :return: The integer representation of the CoolString value rounded down.
         :rtype: int
+        :raises ValueError: If the value cannot be converted to an integer.
         :meta public:
         """
+        self._verbose("Calculating floor value of CoolString")
         val2, pos = self.classifyint(self.val)
         if not pos:
             return int(self) - 1 if self.val[-1] != '0' else int(self)
@@ -1020,6 +1097,7 @@ class CoolString:
         :raises ValueError: If the given value cannot be converted to a numeric.
         :meta public:
         """
+        self._verbose("Performing divmod operation on CoolString")
         return self.__floordiv__(other), self.__mod__(other)
 
     def __unicode__(self):
@@ -1030,6 +1108,7 @@ class CoolString:
         :rtype: str
         :meta public:
         """
+        self._verbose("Converting CoolString to Unicode string")
         return self.val.encode('utf-8')
 
     def __format__(self, format_spec):
@@ -1062,6 +1141,7 @@ class CoolString:
         :raises ValueError: If the format specification is invalid.
         :meta public:
         """
+        self._verbose("Formatting CoolString with format_spec:", format_spec)
         match format_spec:
             case "d":
                 chars = [ord(c) for c in self.val]
@@ -1155,6 +1235,7 @@ class CoolString:
         """
         if name in ("shiftmode", "compmode", "verbose", "val"):
             raise AttributeError("Deleting critical attributes is prohibited")
+        self._verbose(f"Deleting attribute {name} from CoolString")
         super().__delattr__(name)
 
     def __iter__(self):
@@ -1182,6 +1263,7 @@ class CoolString:
         :rtype: str
         :meta public:
         """
+        self._verbose("Called CoolString as a function, because you are cool!")
         x = ['Ymnx%nx%sty%ozxy%f%xywnsl333%ny,x%HTTQ%?.',
              'Ymj%Fsx|jw%yt%ymj%Lwjfy%Vzjxynts%333%tk%Qnkj1%ymj%Zsn{jwxj%fsi%J{jw~ymnsl%333%nx%333%Ktwy~2y|t3',
              'Xufhj1%ymj%knsfq%kwtsynjw3']
@@ -1200,12 +1282,14 @@ class CoolString:
         :meta public:
         """
         if isinstance(idx, slice):
+            self._verbose(f"Getting slice {idx} from CoolString")
             return self._createnew(self.val[idx])
         elif isinstance(idx, int):
             if idx < 0:
                 idx += len(self.val)
             if idx < 0 or idx >= len(self.val):
                 raise IndexError("Index out of range")
+            self._verbose(f"Getting item at index {idx} from CoolString")
             return self._createnew(self.val[idx])
         else:
             raise TypeError("Index must be an integer or a slice")

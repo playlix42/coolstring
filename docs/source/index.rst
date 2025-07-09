@@ -16,3 +16,5 @@ This is the documentation / reference for the **CoolString** class (**coolstring
 
    start
    reference
+   Source Code <https://github.com/playlix42/coolstring>
+   PyPI Package <https://pypi.org/project/coolstring>
