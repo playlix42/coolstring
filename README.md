@@ -14,4 +14,4 @@ This must not necessarily be useful in every case.
 
 ### License
 
-* _coolstring_ is [![lgpl-3.0](https://img.shields.io/badge/license-lgpl__3__0-blue.svg)](LICENSE)
+* _coolstring_ is [![gpl-3.0](https://img.shields.io/badge/license-gpl__3__0-blue.svg)](LICENSE)
