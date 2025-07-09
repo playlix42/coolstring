@@ -1,5 +1,5 @@
 # CoolString
-##A string, but COOL :)
+## A string, but COOL :)
 
 ### Description
 
